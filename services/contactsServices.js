@@ -29,10 +29,31 @@ export async function removeContact(contactId) {
   return result;
 }
 
-export async function addContact(name, email, phone) {
+export async function addContact(data) {
   const contacts = await listContacts();
-  const newContact = { id: nanoid(), name, email, phone };
+  const newContact = { id: nanoid(), ...data };
   contacts.push(newContact);
   await updateContacts(contacts);
   return newContact;
 }
+
+export async function updateContact(id, data) {
+  const contacts = await listContacts();
+  const index = contacts.findIndex((item) => item.id === id);
+  if (index === -1) {
+    return null;
+  }
+  contacts[index] = {
+    ...contacts[index],
+    ...data,
+  };
+  await updateContacts(contacts);
+  return contacts[index];
+}
+export default {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+};

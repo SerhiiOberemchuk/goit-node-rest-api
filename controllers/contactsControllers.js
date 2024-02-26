@@ -1,8 +1,14 @@
 import contactsService from "../services/contactsServices.js";
 
-export const getAllContacts = (req, res) => {};
+export const getAllContacts = async (req, res) => {
+    const result = await contactsService.listContacts();
+    res.json(result)
+};
 
-export const getOneContact = (req, res) => {};
+export const getOneContact = async (req, res) => {
+    // const result = await contactsService.getOneContact()
+    // res.json(result)
+};
 
 export const deleteContact = (req, res) => {};
 
