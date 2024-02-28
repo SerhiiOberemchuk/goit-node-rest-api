@@ -1,18 +1,14 @@
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
-import validateBody from "../helpers/validateBody.js";
-import {
-  createContactSchema,
-  updateContactSchema,
-} from "../schemas/contactsSchemas.js";
+
 import contactsService from "../services/contactsServices.js";
 
-export const getAllContacts = ctrWrapper(async (req, res, next) => {
+export const getAllContacts = ctrWrapper(async (req, res) => {
   const result = await contactsService.listContacts();
   res.json(result);
 });
 
-export const getOneContact = ctrWrapper(async (req, res, next) => {
+export const getOneContact = ctrWrapper(async (req, res) => {
   const { id } = req.params;
   const result = await contactsService.getContactById(id);
   if (!result) {
@@ -21,7 +17,7 @@ export const getOneContact = ctrWrapper(async (req, res, next) => {
   res.json(result);
 });
 
-export const deleteContact = ctrWrapper(async (req, res, next) => {
+export const deleteContact = ctrWrapper(async (req, res) => {
   const { id } = req.params;
 
   const result = await contactsService.removeContact(id);
@@ -31,12 +27,12 @@ export const deleteContact = ctrWrapper(async (req, res, next) => {
   res.status(200).json(result);
 });
 
-export const createContact = ctrWrapper(async (req, res, next) => {
+export const createContact = ctrWrapper(async (req, res) => {
   const result = await contactsService.addContact(req.body);
   res.status(201).json(result);
 });
 
-export const updateContact = ctrWrapper(async (req, res, next) => {
+export const updateContact = ctrWrapper(async (req, res) => {
   const { id } = req.params;
 
   if (Object.keys(req.body).length === 0) {
