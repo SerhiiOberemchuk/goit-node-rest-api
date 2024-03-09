@@ -1,7 +1,7 @@
+import * as contactsService from "../services/contactsServices.js";
+
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
-
-import contactsService from "../services/contactsServices.js";
 
 export const getAllContacts = ctrWrapper(async (req, res) => {
   const result = await contactsService.listContacts();
@@ -37,6 +37,23 @@ export const updateContact = ctrWrapper(async (req, res) => {
 
   if (Object.keys(req.body).length === 0) {
     throw HttpError(400, "Body must have at least one field");
+  }
+
+  const result = await contactsService.updateContact(id, req.body);
+  if (!result) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json(result);
+});
+
+export const updateStatusContact = ctrWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (
+    !Object.keys(req.body).includes("favorite") ||
+    Object.keys(req.body).length !== 1
+  ) {
+    throw HttpError(400, "Body must have only favorite field");
   }
 
   const result = await contactsService.updateContact(id, req.body);
