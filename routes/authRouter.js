@@ -11,13 +11,15 @@ import {
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
+import { upload } from "../middlewares/upload .js";
 
 const authRouter = express.Router();
 
 authRouter.post(
   "/register",
   validateBody(userSignUpSchema),
-  authController.signup
+  upload.single()
+  // authController.signup
 );
 
 authRouter.post("/login", validateBody(userLoginSchema), authController.signin);
