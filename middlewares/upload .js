@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 
-const tempDir = path.join(__dirname, "../", "tmp");
+const tempDir = path.resolve("../", "tmp");
 
 const multerConfig = multer.diskStorage({
   destination: tempDir,

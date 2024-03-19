@@ -6,19 +6,21 @@ import { ctrWrapper } from "../helpers/ctrWrapper.js";
 const { JWT_SECRET } = process.env;
 
 const signup = async (req, res) => {
-  const { email } = req.body;
-  const user = await authServices.findeUser({ email });
-  if (user) {
-    throw HttpError(409, "Email in use");
-  }
+  console.log(req.body);
+  console.log(req.file);
+  // const { email } = req.body;
+  // const user = await authServices.findeUser({ email });
+  // if (user) {
+  //   throw HttpError(409, "Email in use");
+  // }
 
-  const newUser = await authServices.signup(req.body);
-  res.status(201).json({
-    user: {
-      email: newUser.email,
-      subscription: newUser.subscription,
-    },
-  });
+  // const newUser = await authServices.signup(req.body);
+  // res.status(201).json({
+  //   user: {
+  //     email: newUser.email,
+  //     subscription: newUser.subscription,
+  //   },
+  // });
 };
 
 const signin = async (req, res) => {
