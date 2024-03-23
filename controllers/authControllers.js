@@ -1,26 +1,32 @@
+import fs from "fs/promises";
+import gravatar from "gravatar";
+
 import * as authServices from "../services/authServices.js";
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
+import path from "path";
+import Jimp from "jimp";
 
 const { JWT_SECRET } = process.env;
 
-const signup = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
-  // const { email } = req.body;
-  // const user = await authServices.findeUser({ email });
-  // if (user) {
-  //   throw HttpError(409, "Email in use");
-  // }
+const avatarsPath = path.resolve("public", "avatars");
 
-  // const newUser = await authServices.signup(req.body);
-  // res.status(201).json({
-  //   user: {
-  //     email: newUser.email,
-  //     subscription: newUser.subscription,
-  //   },
-  // });
+const signup = async (req, res) => {
+  const { email } = req.body;
+  const user = await authServices.findeUser({ email });
+  if (user) {
+    throw HttpError(409, "Email in use");
+  }
+  const avatarURL = gravatar.url(email);
+  console.log(avatarURL);
+  const newUser = await authServices.signup({ ...req.body, avatarURL });
+  res.status(201).json({
+    user: {
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
+  });
 };
 
 const signin = async (req, res) => {
@@ -76,10 +82,33 @@ const updateSubscribe = async (req, res) => {
   res.json({ message: `Subscription is ${subscription}` });
 };
 
+const resizeImage = async (path) => {
+  const image = await Jimp.read(path);
+  await image.resize(250, 250, Jimp.RESIZE_BICUBIC);
+  await image.writeAsync(path);
+};
+
+const updateAvatar = async (req, res) => {
+  const { path: oldPath, filename } = req.file;
+
+  const pathImage = path.join("tmp", filename);
+  await resizeImage(pathImage);
+
+  const newPath = path.join(avatarsPath, filename);
+  await fs.rename(oldPath, newPath);
+
+  const avatarURL = path.resolve("avatars", filename);
+
+  const { _id } = req.user;
+  await authServices.updateUser({ _id }, { avatarURL });
+  res.status(200).json({ message: `"avatarURL": ${avatarURL}` });
+};
+
 export default {
   signup: ctrWrapper(signup),
   signin: ctrWrapper(signin),
   getCurrent: ctrWrapper(getCurrent),
   logout: ctrWrapper(logout),
   updateSubscribe: ctrWrapper(updateSubscribe),
+  updateAvatar: ctrWrapper(updateAvatar),
 };

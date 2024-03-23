@@ -11,30 +11,14 @@ import {
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
-// import { upload } from "../middlewares/upload .js";
-
-import multer from "multer";
-import path from "path";
-
-const tempDir = path.resolve("../", "tmp");
-
-const multerConfig = multer.diskStorage({
-  destination: tempDir,
-  filename(reg, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
-export const upload = multer({
-  storage: multerConfig,
-});
+import upload from "../middlewares/upload.js";
 
 const authRouter = express.Router();
 
 authRouter.post(
   "/register",
+  upload.single("avatarURL"),
   validateBody(userSignUpSchema),
-  upload.single(),
   authController.signup
 );
 
@@ -49,6 +33,13 @@ authRouter.patch(
   authenticate,
   validateBody(userUpdateSubscribe),
   authController.updateSubscribe
+);
+
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatarURL"),
+  authController.updateAvatar
 );
 
 export default authRouter;
