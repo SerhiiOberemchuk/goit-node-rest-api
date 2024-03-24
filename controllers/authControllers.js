@@ -84,11 +84,15 @@ const updateSubscribe = async (req, res) => {
 
 const resizeImage = async (path) => {
   const image = await Jimp.read(path);
-  await image.resize(250, 250, Jimp.RESIZE_BICUBIC);
+  await image.resize(250, Jimp.AUTO);
   await image.writeAsync(path);
 };
 
 const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, "Avatar file is required");
+  }
+
   const { path: oldPath, filename } = req.file;
 
   const pathImage = path.join("tmp", filename);
@@ -97,11 +101,9 @@ const updateAvatar = async (req, res) => {
   const newPath = path.join(avatarsPath, filename);
   await fs.rename(oldPath, newPath);
 
-  const avatarURL = path.resolve("avatars", filename);
-
   const { _id } = req.user;
-  await authServices.updateUser({ _id }, { avatarURL });
-  res.status(200).json({ message: `"avatarURL": ${avatarURL}` });
+  await authServices.updateUser({ _id }, { avatarURL: `/avatars/${filename}` });
+  res.status(200).json({ avatarURL: `/avatars/${filename}` });
 };
 
 export default {
