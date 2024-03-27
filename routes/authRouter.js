@@ -8,6 +8,7 @@ import {
   userSignUpSchema,
   userLoginSchema,
   userUpdateSubscribe,
+  userEmailSchema,
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
@@ -20,6 +21,14 @@ authRouter.post(
   upload.single("avatarURL"),
   validateBody(userSignUpSchema),
   authController.signup
+);
+
+authRouter.get("/verify/:verificationToken", authController.verify);
+
+authRouter.post(
+  "/verify",
+  validateBody(userEmailSchema),
+  authController.sendMail
 );
 
 authRouter.post("/login", validateBody(userLoginSchema), authController.signin);
