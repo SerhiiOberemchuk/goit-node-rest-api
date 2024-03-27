@@ -64,6 +64,10 @@ const verify = async (req, res) => {
 const sendMail = async (req, res) => {
   const { email } = req.body;
 
+  if (!email) {
+    res.status(400).json({ message: "missing required field email" });
+  }
+
   const user = await authServices.findeUser({ email });
 
   if (!user) {
